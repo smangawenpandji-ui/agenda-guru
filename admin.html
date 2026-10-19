@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin AKTIVA - SMAN 1 Ngawen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--g:#1d4e46;--g2:#2c6b60;--chalk:#f4c95d;--bg:#f2f5f3;--ink:#16302b;--mut:#5d7570;--line:#dbe5e1;--bad:#b83a2e;--ok:#1f7a55;--r:14px}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Figtree,system-ui,sans-serif}
+h1,h2,h3{font-family:'Bricolage Grotesque',Figtree,system-ui,sans-serif;margin:0;line-height:1.2}
+button,input,select,textarea{font:inherit;color:inherit}.hide{display:none!important}:focus-visible{outline:3px solid var(--chalk);outline-offset:2px}
+.btn{border:0;border-radius:10px;padding:9px 14px;font-weight:600;cursor:pointer;background:var(--g);color:#fff}.btn:hover{background:var(--g2)}.btn:disabled{opacity:.6}
+.btn.ghost{background:#fff;color:var(--g);border:1.5px solid var(--line)}.btn.ghost:hover{background:#eaf1ee}.btn.sm{padding:5px 10px;font-size:12px}.btn.bad{background:#fff;color:var(--bad);border:1.5px solid #f0cfca}
+.fld{display:block;margin-bottom:12px}.fld>span{display:block;font-size:13px;font-weight:600;color:var(--mut);margin-bottom:4px}
+.fld input,.fld select,.fld textarea,.q{width:100%;padding:9px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fff}
+#login{min-height:100vh;display:grid;place-items:center;padding:20px;background:var(--g)}.lcard{background:#fff;border-radius:20px;padding:32px;width:100%;max-width:400px}
+.mark{width:44px;height:44px;border-radius:12px;background:var(--chalk);color:var(--g);display:grid;place-items:center;font:700 20px 'Bricolage Grotesque'}
+.err{background:#fbe9e7;color:var(--bad);padding:10px 12px;border-radius:10px;font-size:13px;margin-bottom:12px}
+#app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+nav{background:var(--g);color:#fff;padding:18px 12px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:2px}
+nav .brand{display:flex;gap:10px;align-items:center;padding:0 8px 16px}nav small{opacity:.7;display:block}
+nav .grp{font-size:12px;opacity:.6;padding:12px 10px 4px}
+nav button{background:none;border:0;color:#fff;text-align:left;padding:9px 12px;border-radius:9px;cursor:pointer;opacity:.85;display:flex;justify-content:space-between}
+nav button:hover{background:rgba(255,255,255,.1)}nav button.on{background:var(--chalk);color:var(--g);opacity:1;font-weight:700}
+nav .foot{margin-top:auto;display:grid;gap:6px}nav .foot a,nav .foot button{color:#fff;font-size:13px;text-decoration:none;padding:7px 12px;opacity:.85}
+main{padding:24px;min-width:0}.card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.head{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;margin-bottom:14px}.head p{margin:2px 0 0;color:var(--mut);font-size:13px}.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:16px}
+.tile{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}.tile b{display:block;font:700 30px 'Bricolage Grotesque';color:var(--g)}.tile span{color:var(--mut);font-size:13px}
+.tile.hero{background:var(--g);border-color:var(--g)}.tile.hero b{color:var(--chalk)}.tile.hero span{color:#fff;opacity:.8}
+.grid2{display:grid;grid-template-columns:1.3fr 1fr;gap:16px}
+.pbar{display:flex;height:14px;border-radius:99px;overflow:hidden;background:#e8eeeb;margin:10px 0}.leg{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px}.leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}
+.rk{display:grid;grid-template-columns:70px 1fr 40px;gap:10px;align-items:center;margin:8px 0}.rk div div{height:10px;border-radius:99px;background:var(--g2)}.rk>div{background:#e8eeeb;border-radius:99px;height:10px}
+.tw{overflow:auto;max-height:68vh;border:1px solid var(--line);border-radius:10px}table{border-collapse:collapse;width:100%;font-size:13px}
+th{position:sticky;top:0;background:#eef3f0;text-align:left;padding:9px 12px;white-space:nowrap;font-weight:600}td{padding:9px 12px;border-top:1px solid var(--line);vertical-align:top}tr:hover td{background:#f8faf9}
+.tag{padding:2px 8px;border-radius:99px;font-size:12px;font-weight:600;background:#dff3e8;color:var(--ok)}.tag.off{background:#fbe9e7;color:var(--bad)}.sub{display:block;color:var(--mut);font-size:12px}
+.empty{padding:28px;text-align:center;color:var(--mut)}
+dialog{border:0;border-radius:18px;padding:0;width:min(520px,94vw);max-height:92vh}dialog::backdrop{background:rgba(10,30,26,.55)}
+.dh{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff}.db{padding:20px}
+#toast{position:fixed;bottom:18px;right:18px;padding:11px 18px;border-radius:12px;color:#fff;font-weight:600;z-index:99;max-width:min(440px,90vw)}
+@media(max-width:860px){#app{grid-template-columns:1fr}nav{position:static;height:auto;flex-direction:row;flex-wrap:wrap;padding:10px}nav .brand,nav .grp,nav .foot{display:none}.grid2{grid-template-columns:1fr}main{padding:14px}}
+</style></head><body>
+<section id="login"><form class="lcard" onsubmit="doLogin(event)"><div class="mark">A</div><h1 style="margin:14px 0 2px">Admin AKTIVA</h1><p style="margin:0 0 20px;color:var(--mut)">SMAN 1 Ngawen &middot; pengelolaan data sekolah</p>
+ <div id="lerr" class="err hide"></div>
+ <label class="fld"><span>Username administrator</span><input id="u" required autocomplete="username" autocapitalize="none"></label>
+ <label class="fld"><span>Password</span><input id="p" type="password" required autocomplete="current-password"></label>
+ <button class="btn" id="lbtn" style="width:100%;padding:11px">Masuk dashboard</button>
+ <p style="text-align:center;margin:16px 0 0"><a href="index.html" style="color:var(--mut);font-size:13px">Buka aplikasi guru</a></p></form></section>
+<div id="app" class="hide">
+ <nav><div class="brand"><div class="mark" style="width:38px;height:38px;font-size:18px">A</div><div><b>AKTIVA Admin</b><small>SMAN 1 Ngawen</small></div></div><div id="nav" style="display:contents"></div>
+  <div class="foot"><a href="index.html">Aplikasi guru</a><button onclick="openPass()">Ganti password</button><button onclick="logout()">Keluar</button></div></nav>
+ <main id="main"></main>
+</div>
+<dialog id="dlg"><div class="dh"><h3 id="dt"></h3><button class="btn ghost sm" onclick="dlg.close()" aria-label="Tutup">&times;</button></div><form class="db" id="df"></form></dialog>
+<div id="toast" class="hide"></div>
+<script src="config.js"></script>
+<script>
+const TK='aktiva_admin_token',$=i=>document.getElementById(i),dlg=$('dlg');
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const SEL={'ID Guru':['guru','Nama Guru'],'ID Mapel':['mapel','Mata Pelajaran'],'ID Kelas':['kelas','Kelas']};
+const TYPES={
+ guru:{l:'Guru',id:'ID Guru',f:['ID Guru','Nama Guru','Email','Username','Password','Aktif'],s:['','Budi Santoso, S.Pd.','budi@sman1ngawen.sch.id','budi','Rahasia123','TRUE']},
+ mapel:{l:'Mapel',id:'ID Mapel',f:['ID Mapel','Mata Pelajaran','KKM','Aktif'],s:['','Matematika','75','TRUE']},
+ kelas:{l:'Kelas',id:'ID Kelas',f:['ID Kelas','Kelas','Tingkat','Jurusan','Aktif'],s:['','X-A','X','Umum','TRUE']},
+ siswa:{l:'Siswa',id:'ID Siswa',f:['ID Siswa','NISN','Nama Siswa','ID Kelas','Aktif'],s:['','0012345678','Ahmad Fauzi','(salin ID Kelas dari tab Kelas)','TRUE']},
+ jadwal:{l:'Jadwal',id:'ID Jadwal',f:['ID Jadwal','ID Guru','ID Mapel','ID Kelas','Hari','Jam Mulai','Jam Selesai','Jam Pelajaran','Aktif'],s:['','(ID Guru)','(ID Mapel)','(ID Kelas)','Senin','07:00','08:30','1-2','TRUE']},
+ piket:{l:'Piket',id:'ID Piket',f:['ID Piket','ID Guru','Hari','Jam Mulai','Jam Selesai','Keterangan','Aktif'],s:['','(ID Guru)','Senin','07:00','15:30','Piket gerbang dan ruang guru','TRUE']}};
+const TRX={jurnal:'Jurnal',presensi:'Presensi',penilaian:'Penilaian',refleksi:'Refleksi',nilai:'Nilai siswa',agenda:'Agenda guru',laporpiket:'Laporan piket'};
+let D={},cur='home',rows=[],busy=false,qt;
+function toast(m,ok=true){const t=$('toast');t.textContent=m;t.style.background=ok?'#1f7a55':'#b83a2e';t.classList.remove('hide');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.add('hide'),5000)}
+async function gas(action,data){
+ if(!/^https:\/\//.test(API_URL))throw new Error('URL Web App belum diisi. Buka config.js dan isi API_URL.');
+ let r;try{r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,data:data||{},token:localStorage.getItem(TK)||''})})}catch(e){throw new Error('Tidak dapat terhubung ke server. Periksa internet dan deployment Web App (akses Anyone).')}
+ let o;try{o=await r.json()}catch(e){throw new Error('Respons server tidak valid. Pastikan URL /exec benar dan deployment memakai versi terbaru.')}
+ if(!o.ok){if(/^Sesi/.test(o.message||''))showLogin(o.message);throw new Error(o.message||'Terjadi kesalahan')}return o.data}
+function showLogin(m){localStorage.removeItem(TK);$('app').classList.add('hide');$('login').classList.remove('hide');dlg.open&&dlg.close();const e=$('lerr');if(m){e.textContent=m;e.classList.remove('hide')}else e.classList.add('hide')}
+async function doLogin(e){e.preventDefault();const b=$('lbtn');b.disabled=true;b.textContent='Memproses...';
+ try{const r=await gas('adminLogin',{username:$('u').value.trim(),password:$('p').value.trim()});localStorage.setItem(TK,r.token);$('p').value='';await enter()}catch(x){showLogin(x.message)}finally{b.disabled=false;b.textContent='Masuk dashboard'}}
+async function logout(){try{await gas('logout')}catch(e){}showLogin()}
+async function enter(){$('login').classList.add('hide');$('app').classList.remove('hide');await refresh();go(cur)}
+async function refresh(){try{D=await gas('adminData')}catch(e){toast('Gagal memuat data: '+e.message,false)}}
+function buildNav(){$('nav').innerHTML=`<button data-k="home">Ringkasan</button><div class="grp">Data master</div>`+Object.keys(TYPES).map(k=>`<button data-k="${k}">${TYPES[k].l}<span>${(D[k]||[]).length}</span></button>`).join('')+`<div class="grp">Data transaksi</div>`+Object.keys(TRX).map(k=>`<button data-k="${k}">${TRX[k]}</button>`).join('');
+ $('nav').querySelectorAll('button').forEach(b=>{b.onclick=()=>go(b.dataset.k);b.classList.toggle('on',b.dataset.k===cur)})}
+async function go(k){cur=k;buildNav();$('main').innerHTML='<div class="empty">Memuat...</div>';
+ try{if(k==='home')await home();else if(TYPES[k]){rows=D[k]||[];table(false)}else{const r=await gas('adminTransaksi',{type:k});rows=r.rows;table(true,r.total)}}catch(e){$('main').innerHTML=`<div class="empty">${esc(e.message)}</div>`}}
+async function home(){const d=await gas('adminDashboard'),c=d.counts,p=d.presensi,tot=Object.values(p).reduce((a,b)=>a+b,0);
+ const col={Hadir:'#1f7a55',Terlambat:'#c58b12',Sakit:'#2b6cb0',Izin:'#6b46c1',Alpa:'#b83a2e',Dispensasi:'#718096'},pct=tot?Math.round(p.Hadir/tot*100):0;
+ $('main').innerHTML=`<div class="head"><div><h2>Ringkasan</h2><p>${esc(d.meta.hari)}, ${esc(d.meta.tanggal)}</p></div><button class="btn ghost sm" onclick="refresh().then(()=>go('home'))">Muat ulang</button></div>
+ <div class="tiles"><div class="tile hero"><b>${d.hariIni.terisi}/${d.hariIni.jadwal}</b><span>sesi terisi hari ini</span></div>${[['guru','Guru'],['siswa','Siswa'],['kelas','Kelas'],['mapel','Mapel'],['jadwal','Jadwal']].map(([k,l])=>`<div class="tile"><b>${c[k]}</b><span>${l} aktif</span></div>`).join('')}</div>
+ <div class="grid2"><div class="card"><h3>Belum mengisi jurnal hari ini</h3><p style="color:var(--mut);margin:2px 0 8px">${d.hariIni.belum.length?d.hariIni.belum.length+' sesi menunggu pengisian':'Semua sesi hari ini sudah terisi.'}</p>
+  ${d.hariIni.belum.length?`<div class="tw" style="max-height:340px"><table><tbody>${d.hariIni.belum.map(b=>`<tr><td>${esc(b.mulai)}<span class="sub">JP ${esc(b.jp)}</span></td><td><b>${esc(b.guru)}</b><span class="sub">${esc(b.mapel)} &middot; ${esc(b.kelas)}</span></td></tr>`).join('')}</tbody></table></div>`:''}</div>
+  <div style="display:grid;gap:16px;align-content:start"><div class="card"><h3>Guru piket hari ini</h3>${(d.piket||[]).length?(d.piket||[]).map(p=>`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 0;border-top:1px solid var(--line)"><span><b>${esc(p.guru)}</b>${p.mulai?`<span class="sub">${esc(p.mulai)}${p.selesai?' - '+esc(p.selesai):''}</span>`:''}</span><span class="tag ${p.lapor?'':'off'}">${p.lapor?'Laporan masuk':'Belum lapor'}</span></div>`).join(''):'<p class="empty">Belum ada jadwal piket hari ini.</p>'}</div><div class="card"><h3>Kehadiran siswa bulan ini</h3>${tot?`<b style="font:700 28px 'Bricolage Grotesque';color:var(--g)">${pct}%</b><div class="pbar">${Object.keys(p).map(k=>`<div title="${k}" style="width:${p[k]/tot*100}%;background:${col[k]}"></div>`).join('')}</div><div class="leg">${Object.keys(p).map(k=>`<span><i style="background:${col[k]}"></i>${k} ${p[k]}</span>`).join('')}</div>`:'<p class="empty">Belum ada data presensi bulan ini.</p>'}</div>
+  <div class="card"><h3>Peringkat kelas bulan ini</h3>${d.ranking.length?d.ranking.map(r=>`<div class="rk"><b>${esc(r.kelas)}</b><div><div style="width:${r.rata/5*100}%"></div></div><span>${r.rata}</span></div>`).join(''):'<p class="empty">Belum ada penilaian bulan ini.</p>'}</div></div></div>`}
+function cell(k,v){if(k==='Aktif')return`<span class="tag ${String(v).toLowerCase()==='false'?'off':''}">${String(v).toLowerCase()==='false'?'Nonaktif':'Aktif'}</span>`;
+ if(SEL[k]){const [t,n]=SEL[k],x=(D[t]||[]).find(r=>r[k]==v);return esc(v)+(x?`<span class="sub">${esc(x[n])}</span>`:'')}
+ if(k==='Timestamp'&&v)return esc(new Date(v).toLocaleString('id-ID'));return esc(v)}
+function table(trx,total){const k=cur,T=TYPES[k],title=T?'Data '+T.l:TRX[k];
+ $('main').innerHTML=`<div class="head"><div><h2>${title}</h2><p id="cnt"></p></div><div class="tools"><input class="q" id="q" placeholder="Cari..." style="width:170px" oninput="clearTimeout(qt);qt=setTimeout(()=>trx?search():draw(),250)">
+ <button class="btn ghost sm" onclick="exportCSV()">Export CSV</button>${T?`<button class="btn ghost sm" onclick="tpl()">Template</button><label class="btn ghost sm" style="cursor:pointer">Import CSV<input type="file" accept=".csv" hidden onchange="imp(event)"></label><button class="btn sm" onclick="openForm()">Tambah ${T.l}</button>`:''}</div></div>
+ <div class="card" style="padding:0"><div class="tw" id="tw"></div></div>`;draw(total)}
+async function search(){try{const r=await gas('adminTransaksi',{type:cur,q:$('q').value});rows=r.rows;draw(r.total)}catch(e){toast(e.message,false)}}
+function draw(total){const T=TYPES[cur],q=$('q').value.trim().toLowerCase();let r=rows;
+ if(T&&q)r=rows.filter(x=>Object.values(x).some(v=>String(v).toLowerCase().includes(q)));
+ window.view=r.slice(0,300);$('cnt').textContent=(total??r.length)+' data'+((total??r.length)>300?' (300 teratas, gunakan pencarian)':'');
+ if(!r.length){$('tw').innerHTML='<div class="empty">Tidak ada data.</div>';return}
+ const ks=Object.keys(r[0]).filter(k=>k!=='PasswordHash');
+ $('tw').innerHTML=`<table><thead><tr>${ks.map(k=>`<th>${esc(k)}</th>`).join('')}${T?'<th></th>':''}</tr></thead><tbody>${view.map((x,i)=>`<tr>${ks.map(k=>`<td>${cell(k,x[k])}</td>`).join('')}${T?`<td style="white-space:nowrap"><button class="btn ghost sm" onclick="openForm(${i})">Ubah</button> <button class="btn bad sm" onclick="del(${i})">Hapus</button></td>`:''}</tr>`).join('')}</tbody></table>`}
+function open_(t,html,fn){$('dt').textContent=t;$('df').innerHTML=html;$('df').onsubmit=async e=>{e.preventDefault();if(busy)return;busy=true;const b=$('df').querySelector('.btn[type=submit]');b&&(b.disabled=true);try{await fn(new FormData(e.target));dlg.close()}catch(x){toast(x.message,false)}busy=false;b&&(b.disabled=false)};dlg.showModal()}
+function openForm(i){const T=TYPES[cur],r=i===undefined?null:view[i],fld=(l,inner)=>`<label class="fld"><span>${l}</span>${inner}</label>`;
+ open_((r?'Ubah ':'Tambah ')+T.l,T.f.map(f=>{const v=r?r[f]??'':'';
+  if(f===T.id)return fld(f+(r?'':' (kosong = otomatis)'),`<input name="${f}" value="${esc(v)}" ${r?'readonly style="background:#eef3f0"':''}>`);
+  if(f==='Password')return fld(r?'Password baru (kosongkan jika tidak diganti)':'Password',`<input type="password" name="Password" autocomplete="new-password" ${r?'':'required'}>`);
+  if(f==='Aktif')return fld('Status',`<select name="Aktif"><option value="TRUE">Aktif</option><option value="FALSE" ${String(v).toLowerCase()==='false'?'selected':''}>Nonaktif</option></select>`);
+  if(SEL[f]){const [t,n]=SEL[f];return fld(f,`<select name="${f}" required><option value="">Pilih...</option>${(D[t]||[]).map(x=>`<option value="${esc(x[f])}" ${x[f]==v?'selected':''}>${esc(x[n])}</option>`).join('')}</select>`)}
+  if(f==='Hari')return fld(f,`<select name="Hari">${['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'].map(h=>`<option ${h===v?'selected':''}>${h}</option>`).join('')}</select>`);
+  if(f.startsWith('Jam ')&&f!=='Jam Pelajaran')return fld(f,`<input type="time" name="${f}" value="${esc(v)}" ${cur==='jadwal'?'required':''}>`);
+  return fld(f,`<input name="${f}" value="${esc(v)}">`)}).join('')+`<button class="btn" type="submit" style="width:100%">Simpan</button>`,
+ async fd=>{await gas('adminUpsert',{type:cur,obj:Object.fromEntries(fd.entries())});toast('Data tersimpan');await refresh();go(cur)})}
+async function del(i){const T=TYPES[cur],id=view[i][T.id];if(!confirm(`Hapus ${T.l} dengan ID ${id}?`))return;
+ try{await gas('adminDelete',{type:cur,id});toast('Data dihapus');await refresh();go(cur)}catch(e){toast(e.message,false)}}
+function openPass(){open_('Ganti password admin',`<label class="fld"><span>Password lama</span><input type="password" name="o" required autocomplete="current-password"></label><label class="fld"><span>Password baru (min. 8 karakter)</span><input type="password" name="n" required minlength="8" autocomplete="new-password"></label><button class="btn" type="submit" style="width:100%">Simpan</button>`,async fd=>{await gas('changePassword',{oldPass:fd.get('o'),newPass:fd.get('n')});toast('Password berhasil diganti')})}
+/* CSV */
+const cc=v=>/[",\n;]/.test(String(v))?'"'+String(v).replace(/"/g,'""')+'"':String(v);
+function dl(n,t){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+t],{type:'text/csv;charset=utf-8'}));a.download=n;document.body.appendChild(a);a.click();a.remove()}
+function parseCSV(t){t=t.replace(/^\uFEFF/,'');const f=t.split(/\r?\n/)[0],d=(f.match(/;/g)||[]).length>(f.match(/,/g)||[]).length?';':',',R=[];let r=[],c='',q=false;
+ for(let i=0;i<t.length;i++){const x=t[i];if(q){if(x==='"'){if(t[i+1]==='"'){c+='"';i++}else q=false}else c+=x}else if(x==='"')q=true;else if(x===d){r.push(c);c=''}else if(x==='\n'||x==='\r'){if(x==='\r'&&t[i+1]==='\n')i++;r.push(c);c='';R.push(r);r=[]}else c+=x}
+ if(c!==''||r.length){r.push(c);R.push(r)}return R.filter(r=>r.some(c=>c.trim()!==''))}
+function tpl(){const T=TYPES[cur];dl(`template_${cur}_aktiva.csv`,[T.f,T.s].map(r=>r.map(cc).join(',')).join('\r\n'))}
+async function exportCSV(){try{const r=await gas('adminExport',{type:cur});if(!r.length)return toast('Tidak ada data untuk diexport',false);const ks=Object.keys(r[0]);dl(`${cur}_aktiva.csv`,[ks,...r.map(x=>ks.map(k=>x[k]))].map(r=>r.map(cc).join(',')).join('\r\n'))}catch(e){toast(e.message,false)}}
+function imp(ev){const file=ev.target.files[0];if(!file)return;const rd=new FileReader();rd.onload=async e=>{const reset=()=>ev.target.value='',tb=parseCSV(e.target.result),T=TYPES[cur];
+ if(tb.length<2){toast('File CSV kosong atau tidak valid',false);return reset()}
+ const hd=tb[0].map(h=>h.trim());if(!hd.some(h=>T.f.includes(h))){toast('Header CSV tidak cocok. Gunakan tombol Template.',false);return reset()}
+ const recs=tb.slice(1).map(r=>{const o={};hd.forEach((h,i)=>{if(T.f.includes(h))o[h]=(r[i]||'').trim()});['ID Kelas','ID Guru','ID Mapel'].forEach(k=>{if(o[k]&&o[k].startsWith('('))o[k]=''});return o});
+ if(!confirm(`Impor ${recs.length} baris ke ${T.l}?\nID yang sudah ada diperbarui, ID kosong dibuat otomatis. Baris yang tidak valid akan dilewati dan dilaporkan.`))return reset();
+ try{const r=await gas('adminImport',{type:cur,records:recs});toast(`${r.inserted} baru, ${r.updated} diperbarui`+(r.errors.length?`, ${r.errors.length} dilewati. ${r.errors[0]}`:''),!r.errors.length);await refresh();go(cur)}catch(x){toast(x.message,false)}reset()};rd.readAsText(file)}
+window.onload=()=>{if(localStorage.getItem(TK))enter().catch(e=>showLogin(/^Sesi/.test(e.message)?null:e.message))};
+</script></body></html>
