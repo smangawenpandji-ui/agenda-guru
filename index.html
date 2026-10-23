@@ -77,6 +77,7 @@ header.top{box-shadow:0 1px 12px rgba(15,42,74,.06)}
      <button class="mc" style="--c:#d9480f" onclick="nilaiForm()"><span class="ic">💯</span><b>Input nilai siswa</b><small>Tugas, kuis, ulangan, dengan info tuntas dan remedial</small></button>
    <button class="mc" style="--c:#0b7285" onclick="agendaForm()"><span class="ic">🗓️</span><b>Agenda dan pengingat</b><small>Catat ulangan, tugas, remedial, rapat</small></button>
    <button class="mc" style="--c:#8a5a00" onclick="piketForm()"><span class="ic">🛡️</span><b>Piket guru</b><small id="ptxt">Laporan tugas piket harian</small></button>
+   <button class="mc" style="--c:#0369a1" onclick="expForm()"><span class="ic">📥</span><b>Unduh laporan</b><small>Simpan jurnal, presensi, nilai ke PDF atau Excel</small></button>
   </div>
   <div class="card" style="margin-top:16px"><div class="sec"><h2>Jadwal hari ini</h2></div><div id="sched"></div></div>
   <div class="card" style="margin-top:16px"><div class="sec"><h2>Piket hari ini</h2><button class="btn sm hide" id="pkbtn" onclick="piketForm()">Isi laporan</button></div><div id="pik"></div></div>
@@ -191,4 +192,46 @@ function piketForm(){const P=H.piket||{};
   ta('terlambat','Siswa terlambat (nama, kelas, alasan)',L.terlambat||'')+ta('izin','Siswa izin, sakit, atau izin keluar',L.izin||'')+ta('guruAbsen','Guru tidak hadir / kelas kosong (dan guru pengganti)',L.guruAbsen||'')+ta('kejadian','Kejadian penting hari ini',L.kejadian||'')+ta('tindak','Tindak lanjut / catatan untuk piket berikutnya',L.tindak||'')+
   `<button class="btn" type="submit" style="width:100%">Simpan laporan piket</button>`,fd=>gas('savePiket',Object.fromEntries(fd.entries())))}
 window.onload=()=>{if(localStorage.getItem(TK))load().catch(e=>showLogin(/^Sesi/.test(e.message)?null:e.message))};
+
+/* ---------- Unduh laporan (PDF / Excel) ---------- */
+const EXP={jurnal:'Jurnal KBM',presensi:'Presensi murid',nilai:'Nilai siswa',penilaian:'Penilaian kelas',refleksi:'Refleksi harian',agenda:'Agenda'};
+const LIBS={xlsx:['https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'],pdf:['https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js','https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js']};
+const loadJs=u=>new Promise((ok,no)=>{const s=document.createElement('script');s.src=u;s.onload=ok;s.onerror=()=>no(new Error('Gagal memuat pustaka unduhan. Periksa koneksi internet.'));document.head.appendChild(s)});
+async function needLib(k){for(const u of LIBS[k])await loadJs(u)}
+function expForm(){
+ const iso=H.meta.iso,first=iso.slice(0,8)+'01';
+ open_('Unduh laporan',`<label class="fld"><span>Jenis laporan</span><select name="type" id="x_t">${Object.keys(EXP).map(k=>`<option value="${k}">${EXP[k]}</option>`).join('')}</select></label>
+ <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><label class="fld"><span>Dari tanggal</span><input type="date" name="dari" value="${first}" max="${iso}"></label><label class="fld"><span>Sampai tanggal</span><input type="date" name="sampai" value="${iso}" max="${iso}"></label></div>
+ <div id="x_f"><label class="fld"><span>Kelas (opsional)</span><select name="kelasId"><option value="">Semua kelas</option>${H.master.kelas.map(k=>`<option value="${esc(k.id)}">${esc(k.nama)}</option>`).join('')}</select></label>
+ <label class="fld"><span>Mata pelajaran (opsional)</span><select name="mapelId"><option value="">Semua mapel</option>${H.master.mapel.map(k=>`<option value="${esc(k.id)}">${esc(k.nama)}</option>`).join('')}</select></label></div>
+ <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px"><button type="button" class="btn" onclick="doExp('pdf')">📄 Unduh PDF</button><button type="button" class="btn" onclick="doExp('xlsx')">📊 Unduh Excel</button></div>
+ <p class="sum" id="x_m">Data yang diunduh hanya milik Anda sendiri.</p>`,async()=>{},true);
+ $('df').onsubmit=e=>e.preventDefault();
+ $('x_t').onchange=()=>{const t=$('x_t').value;$('x_f').style.display=['refleksi','agenda'].includes(t)?'none':''};
+}
+async function doExp(fmt){
+ if(busy)return;const f=$('df'),fd=new FormData(f),type=fd.get('type'),m=$('x_m'),bs=f.querySelectorAll('button[onclick^=doExp]');
+ if(fd.get('dari')&&fd.get('sampai')&&fd.get('dari')>fd.get('sampai'))return toast('Tanggal awal tidak boleh melewati tanggal akhir.',false);
+ busy=true;bs.forEach(b=>b.disabled=true);m.textContent='Mengambil data...';
+ try{
+  const hide=['refleksi','agenda'].includes(type);
+  const r=await gas('teacherExport',{type,dari:fd.get('dari'),sampai:fd.get('sampai'),kelasId:hide?'':fd.get('kelasId'),mapelId:hide?'':fd.get('mapelId')});
+  if(!r.rows.length){m.textContent='Tidak ada data pada rentang tersebut.';return toast('Tidak ada data untuk diunduh.',false)}
+  m.textContent='Menyiapkan file...';await needLib(fmt);
+  const dd=s=>s?s.split('-').reverse().join('/'):'...',title='Laporan '+EXP[type],sub=`${r.guru} | Periode ${dd(fd.get('dari'))} - ${dd(fd.get('sampai'))}`,name=`${title.replace(/ /g,'_')}_${fd.get('dari')||'awal'}_${fd.get('sampai')||'akhir'}`;
+  if(fmt==='xlsx'){
+   const ws=XLSX.utils.aoa_to_sheet([[title],[sub],[],r.cols].concat(r.rows));
+   ws['!cols']=r.cols.map((c,i)=>({wch:Math.min(50,Math.max(c.length+2,...r.rows.slice(0,200).map(x=>String(x[i]).length+2)))}));
+   const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,EXP[type].slice(0,30));XLSX.writeFile(wb,name+'.xlsx');
+  }else{
+   const {jsPDF}=window.jspdf,doc=new jsPDF({orientation:r.cols.length>6?'landscape':'portrait',unit:'pt',format:'a4'});
+   doc.setFontSize(14);doc.text('SMAN 1 Ngawen - '+title,40,40);doc.setFontSize(10);doc.setTextColor(90);doc.text(sub,40,58);
+   doc.autoTable({startY:72,head:[r.cols],body:r.rows.map(x=>x.map(String)),styles:{fontSize:8,cellPadding:4},headStyles:{fillColor:[15,42,74]},alternateRowStyles:{fillColor:[238,243,250]},margin:{left:40,right:40},
+    didDrawPage:d=>{doc.setFontSize(8);doc.text('Halaman '+doc.internal.getNumberOfPages(),doc.internal.pageSize.getWidth()-90,doc.internal.pageSize.getHeight()-20)}});
+   doc.save(name+'.pdf');
+  }
+  m.textContent=`${r.rows.length} baris berhasil diunduh.`+(r.terpotong?` (Dibatasi 5000 dari ${r.total} baris, persempit rentang tanggal.)`:'');toast('File berhasil diunduh');
+ }catch(e){m.textContent='';toast(e.message,false)}
+ finally{busy=false;bs.forEach(b=>b.disabled=false)}
+}
 </script></body></html>
