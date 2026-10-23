@@ -181,6 +181,7 @@ function dispatch_(a, d, t) {
     // guru
     case 'teacherHome': return teacherHome_(auth_(t,['teacher']));
     case 'siswaKelas': auth_(t,['teacher']); return rows_('siswa').filter(x => !off_(x) && String(x['ID Kelas']) === String(d.kelasId)).map(x => ({id:x['ID Siswa'], nama:x['Nama Siswa']}));
+    case 'teacherExport': return teacherExport_(auth_(t,['teacher']), d);
     case 'sesiDetail': return sesiDetail_(auth_(t,['teacher']), d);
     case 'saveSesi': return saveSesi_(auth_(t,['teacher']), d);
     case 'savePenilaian': return savePenilaian_(auth_(t,['teacher']), d);
@@ -450,6 +451,32 @@ function saveNilai_(s, d) {
   } finally { lock.releaseLock(); }
   const v = siswa.map(x => Number(sc[x['ID Siswa']]));
   return {siswa:v.length, tuntas:v.filter(x => x >= kkm).length, rata:Number((v.reduce((a,b) => a+b, 0)/v.length).toFixed(1))};
+}
+
+/* ---------- Unduh laporan guru (PDF / Excel dibuat di browser) ---------- */
+const EXPORT_COLS = {
+  jurnal:['Tanggal','Hari','Mata Pelajaran','Kelas','Jam Pelajaran','Materi','Keterangan'],
+  presensi:['Tanggal','Mata Pelajaran','Kelas','Jam Pelajaran','Nama Siswa','Status'],
+  nilai:['Tanggal','Mata Pelajaran','Kelas','Jenis','Topik','Nama Siswa','Nilai','KKM','Tuntas'],
+  penilaian:['Tanggal','Kelas','Kehadiran','Penampilan','Pakaian','Kebersihan','Keaktifan','Perilaku','Integritas','Rata Rata'],
+  refleksi:['Tanggal','Facts','Feelings','Findings','Future','Rating Kebahagiaan'],
+  agenda:['Tanggal','Judul','Jenis','Selesai']
+};
+function teacherExport_(s, d) {
+  const cols = EXPORT_COLS[d.type];
+  if (!cols) throw new Error('Jenis laporan tidak dikenal.');
+  const iso = v => { const x = parseD_(v); return isNaN(x) ? '' : Utilities.formatDate(x, CONFIG.TZ, 'yyyy-MM-dd'); };
+  const yes = v => v === true || String(v).toUpperCase() === 'TRUE' ? 'Ya' : (v === false || String(v).toUpperCase() === 'FALSE' ? 'Tidak' : v);
+  let r = rows_(d.type).filter(x => String(x['ID Guru']) === String(s.user));
+  if (/^\d{4}-\d{2}-\d{2}$/.test(d.dari || '')) r = r.filter(x => iso(x['Tanggal']) >= d.dari);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(d.sampai || '')) r = r.filter(x => iso(x['Tanggal']) <= d.sampai);
+  if (d.kelasId && cols.indexOf('Kelas') >= 0) r = r.filter(x => String(x['ID Kelas']) === String(d.kelasId));
+  if (d.mapelId && cols.indexOf('Mata Pelajaran') >= 0) r = r.filter(x => String(x['ID Mapel']) === String(d.mapelId));
+  r.sort((a, b) => (iso(a['Tanggal']) + String(a['Timestamp'] || '')).localeCompare(iso(b['Tanggal']) + String(b['Timestamp'] || '')));
+  const total = r.length, LIM = 5000;
+  const g = rows_('guru').find(x => String(x['ID Guru']) === String(s.user)) || {};
+  return {cols: cols, total: total, terpotong: total > LIM, guru: g['Nama Guru'] || '',
+    rows: r.slice(0, LIM).map(x => cols.map(c => { const v = (c === 'Selesai' || c === 'Tuntas') ? yes(x[c]) : x[c]; return v === undefined || v === null ? '' : v; }))};
 }
 
 /* ---------- Piket guru ---------- */
